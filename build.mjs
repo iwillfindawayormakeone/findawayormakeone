@@ -70,8 +70,8 @@ ${ogImage ? `<meta property="og:image" content="${esc(abs(ogImage))}">\n<meta na
 <link rel="icon" href="${favicon}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"></noscript>
 <style>${css}</style>
 <script src="/app.js" defer></script>
 ${jsonld.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join("\n")}
@@ -84,7 +84,7 @@ ${jsonld.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</sc
       <a href="/picks/" ${current === "picks" ? 'aria-current="page"' : ""}>Things I've tried</a>
       <a href="/#work" class="hide-sm">Teaching</a>
       ${storefront}
-      <a href="/disclosure/" ${current === "disclosure" ? 'aria-current="page"' : ""}>Disclosure</a>
+      <a href="/disclosure/" class="hide-sm" ${current === "disclosure" ? 'aria-current="page"' : ""}>Disclosure</a>
     </div>
   </div>
 </nav>
@@ -135,60 +135,49 @@ function searchForm(action = "/") {
 </form>`;
 }
 
-/* ---------- home: the LLC's mission ---------- */
+/* ---------- home: a letter, then the one latest thing ---------- */
 function home() {
-  const latest = picks.slice(0, 3);
-  const stack = [...latest].reverse().map((p) => `<a href="${pickPath(p)}" aria-label="${esc(p.title)}"><img src="${esc(p.images[0].src)}" alt="" width="800" height="600" loading="eager"${p.images[0].fit === "contain" ? ' class="contain"' : ""}></a>`).join("");
+  const latest = picks[0];
+  const feature = latest ? `
+<section class="feature band">
+  <div class="col">
+    <a class="print" href="${pickPath(latest)}" aria-label="${esc(latest.title)}"><img src="${esc(latest.images[0].src)}" alt="${esc(latest.images[0].alt)}" width="600" height="600" loading="eager"${latest.images[0].fit === "contain" ? ' class="contain"' : ""}></a>
+    <div>
+      <p class="label">The latest thing I tried</p>
+      <h2><a href="${pickPath(latest)}">${esc(latest.title)}</a></h2>
+      ${latest.product ? `<p class="product">${esc(latest.product)}</p>` : ""}
+      <p class="why">${esc(latest.short)} <a class="u" href="${pickPath(latest)}">Why this one</a></p>
+      <a class="btn" href="${esc(buyUrl(latest))}" target="_blank" rel="noopener sponsored">Get it on Amazon <span class="ico" aria-hidden="true">&#8599;</span></a>
+      <p class="aff">${AFF_LINE}</p>
+    </div>
+  </div>
+</section>` : "";
   const body = `
 <header class="hero">
-  <div class="wrap hero-grid">
-    <div>
-      <h1 class="rise" style="max-width:12ch">Find a way <em>or make one.</em></h1>
-      <p class="lede rise d1">I teach people how to teach. Everything I try, I try so I can teach it better, and I study how I learn it on the way.</p>
-      <div class="ctas rise d2">
-        <a class="btn" href="/picks/">Things I've tried <span class="ico" aria-hidden="true">&rarr;</span></a>
-        <a class="btn ghost" href="#work">Teaching and coaching <span class="ico" aria-hidden="true">&rarr;</span></a>
-      </div>
+  <div class="col">
+    <h1 class="rise">Find a way <em>or make one.</em></h1>
+    <p class="lede rise d1">I teach people how to teach. Everything I try, I try so I can teach it better, and I study how I learn it on the way.</p>
+    <div class="letter rise d2">
+      <p>Before I teach something, I go do it. Learn the instrument. Build the website. Read the whole book, not the summary. Buy the thing and use it for a month. While I do it, I watch how I learn it: where I got stuck, what finally made it click, what I would skip next time. Then I teach it while the scrapes are still fresh.</p>
+      <p>${esc(site.legalName)} is one person. I teach music in a public school. I have written curriculum for schools, and I have been paid to coach, run clinics, and lead workshops. The subject changes. The craft of teaching it is the point.</p>
     </div>
-    <div class="stack${latest.length < 2 ? " single" : ""} rise d2" aria-label="Latest things I've tried">${stack}</div>
+    <div class="ctas rise d3">
+      <a class="btn" href="/picks/">Things I've tried <span class="ico" aria-hidden="true">&rarr;</span></a>
+      <a class="btn ghost" href="#work">Teaching and coaching <span class="ico" aria-hidden="true">&rarr;</span></a>
+    </div>
+    ${hasPortrait ? `<div class="print" style="max-width:220px;margin-top:36px"><img src="/img/jd.jpg" alt="JD" width="600" height="750" loading="lazy"></div>` : ""}
+    <p class="sig rise d3">JD<small>${esc(site.legalName)}</small></p>
   </div>
 </header>
-
-<section id="how" class="band">
-  <div class="wrap">
-    <div class="about-grid">
-      <div class="portrait reveal">
-        ${hasPortrait ? '<img src="/img/jd.jpg" alt="JD, the person behind Find a Way or Make One" width="600" height="750" loading="lazy">' : '<div class="ph">Drop <b>&nbsp;img/jd.jpg&nbsp;</b> in the folder and this becomes your photo.</div>'}
-      </div>
-      <div class="reveal about">
-        <h2>The rule I run everything by</h2>
-        <p>Before I teach something, I go do it. Learn the instrument. Build the website. Read the whole book, not the summary. Buy the thing and use it for a month. While I do it, I watch how I learn it: where I got stuck, what finally made it click, what I would skip next time. That is the real material. Then I teach it while the scrapes are still fresh.</p>
-        <p>${esc(site.legalName)} is one person: me, JD. I teach music in a public school. I have written curriculum for schools, and I have been paid to coach, run clinics, and lead workshops. The subject changes. The craft of teaching it is the point.</p>
-        <p>The name is the whole philosophy. If the path is there, find it. If it is not, make one.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
+${feature}
 <section id="work">
   <div class="wrap">
     <div class="section-head reveal"><h2>What I do</h2></div>
     <div class="steps reveal">
-      <div><h3>Teaching teachers</h3><p>Curriculum for schools, clinics, workshops, and professional development. Pedagogy is the center of everything here: not just what to teach, but how a person actually learns it, and how to tell when they have. ${site.contactEmail ? `Reach me at <a href="mailto:${esc(site.contactEmail)}" style="text-decoration:underline">${esc(site.contactEmail)}</a>.` : "Booking details are coming soon."}</p></div>
+      <div><h3>Teaching teachers</h3><p>Curriculum for schools, clinics, workshops, and professional development. Pedagogy is the center of everything here: not just what to teach, but how a person actually learns it, and how to tell when they have. ${site.contactEmail ? `Reach me at <a class="u" href="mailto:${esc(site.contactEmail)}">${esc(site.contactEmail)}</a>.` : "Booking details are coming soon."}</p></div>
       <div><h3>Coaching</h3><p>One on one, for people who know what they want and keep not doing it. We find the way that fits your actual life, or we make one. Same method as the classroom: short lessons, real reps, honest feedback.</p></div>
-      <div><h3>Things I've tried</h3><p>Things I researched, bought, and used, with the link and why I picked each one. Some links pay me a small commission. Every one says so. <a href="/picks/" style="text-decoration:underline">See the list</a>.</p></div>
+      <div><h3>Things I've tried</h3><p>Things I researched, bought, and used, with the link and why I picked each one. Some links pay me a small commission. Every one says so. <a class="u" href="/picks/">See the list</a>.</p></div>
     </div>
-  </div>
-</section>
-
-<section id="latest" class="band">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <h2>Latest things I've tried</h2>
-      <p>Newest first. Each one has the link and why I picked it.</p>
-    </div>
-    <div class="grid">${latest.map((p, i) => card(p, i + 2)).join("\n")}</div>
-    <p class="reveal" style="margin-top:28px"><a class="btn ghost" href="/picks/">All things I've tried <span class="ico" aria-hidden="true">&rarr;</span></a></p>
   </div>
 </section>`;
   return layout({ title: "", fullTitle: site.seoTitle || site.name, desc: site.description, canonical: abs("/"), body, ogImage: picks[0]?.images[0]?.src, current: "home",
@@ -202,7 +191,7 @@ function home() {
 function picksPage() {
   const chips = site.categories.filter((c) => picks.some((p) => p.category === c)).map((c) => `<a href="${catPath(c)}" data-cat="${esc(c)}">${esc(c)}</a>`).join("");
   const body = `
-<header class="hero">
+<header class="hero list">
   <div class="wrap">
     <div class="crumb"><a href="/">&larr; Home</a></div>
     <h1 class="rise">Things I've tried, and would tell a <em>friend</em> about.</h1>
@@ -232,7 +221,7 @@ function picksPage() {
       <div><h3>I write what actually happened.</h3><p>Not the box copy. What broke, what surprised me, what I would tell you if you asked me in the hallway.</p></div>
       <div><h3>You click, you decide.</h3><p>Every link goes to Amazon. If you buy, I earn a small commission and you pay exactly the same price. That is how this site pays for itself.</p></div>
     </div>
-    <p class="disclosure-note reveal"><b>Plain-English disclosure:</b> ${DISCLOSURE} The full version is on the <a href="/disclosure/" style="text-decoration:underline">disclosure page</a>.</p>
+    <p class="disclosure-note reveal"><b>Plain-English disclosure:</b> ${DISCLOSURE} The full version is on the <a class="u" href="/disclosure/">disclosure page</a>.</p>
   </div>
 </section>`;
   return layout({ title: "Things I've tried", desc: "Honest Amazon picks from a music teacher and life coach: what I bought, what happened, and who should skip it. Searchable, newest first.", canonical: abs("/picks/"), body, ogImage: picks[0]?.images[0]?.src, current: "picks",
@@ -249,7 +238,7 @@ function pickPage(p) {
       <p class="aff">${AFF_LINE}</p>`;
   const body = `
 <header class="pick-head">
-  <div class="wrap pick-top">
+  <div class="col">
     <div class="pick-text">
       <div class="crumb"><a href="/picks/">&larr; Things I've tried</a></div>
       <div class="meta"><a class="pill" href="${catPath(p.category)}">${esc(p.category)}</a></div>
@@ -267,7 +256,7 @@ function pickPage(p) {
 </header>
 ${more.length ? `<div class="wrap"><div class="gallery n${Math.min(more.length, 3)}">${more.slice(0, 3).map((im) => `<figure><img src="${esc(im.src)}" alt="${esc(im.alt)}" width="1200" height="900" loading="lazy"${im.fit === "contain" ? ' class="contain"' : ""}></figure>`).join("")}</div></div>` : ""}
 ${p.body && p.body.length ? `<section class="pick-why">
-  <div class="wrap prose">
+  <div class="col">
     <p class="more-intro">If you want the details, here they are.</p>
     ${p.body.map((sec) => `<h2>${esc(sec.h)}</h2>${sec.p.map((t) => `<p>${esc(t)}</p>`).join("")}`).join("\n")}
     <div class="again">${buy}</div>
