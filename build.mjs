@@ -174,9 +174,9 @@ ${feature}
   <div class="wrap">
     <div class="section-head reveal"><h2>What I do</h2></div>
     <div class="steps reveal">
-      <div><h3>Teaching teachers</h3><p>Curriculum for schools, clinics, workshops, and professional development. Pedagogy is the center of everything here: not just what to teach, but how a person actually learns it, and how to tell when they have. ${site.contactEmail ? `Reach me at <a class="u" href="mailto:${esc(site.contactEmail)}">${esc(site.contactEmail)}</a>.` : "Booking details are coming soon."}</p></div>
+      <div><h3>Teaching teachers</h3><p>Curriculum for schools, clinics, workshops, and professional development. Pedagogy is the center of everything here: how a person actually learns a thing, and how to tell when they have. ${site.contactEmail ? `Reach me at <a class="u" href="mailto:${esc(site.contactEmail)}">${esc(site.contactEmail)}</a>.` : "Booking details are coming soon."}</p></div>
       <div><h3>Coaching</h3><p>One on one, for people who know what they want and keep not doing it. We find the way that fits your actual life, or we make one. Same method as the classroom: short lessons, real reps, honest feedback.</p></div>
-      <div><h3>Things I've tried</h3><p>Things I researched, bought, and used, with the link and why I picked each one. Some links pay me a small commission. Every one says so. <a class="u" href="/picks/">See the list</a>.</p></div>
+      <div><h3>Things I've tried</h3><p>Things I bought and used, with the link and why I picked each one. Some links pay me a small commission. Every one says so. <a class="u" href="/picks/">See the list</a>.</p></div>
     </div>
   </div>
 </section>`;
