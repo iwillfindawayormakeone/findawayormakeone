@@ -119,7 +119,7 @@ function card(p, i, { reveal = true, h = "h3" } = {}) {
   const size = i === 0 ? "lg" : i === 1 ? "md" : "";
   const img = p.images[0];
   return `<a class="card ${size} ${reveal ? "reveal" : ""}" href="${pickPath(p)}" data-category="${esc(p.category)}" data-hay="${esc(hay(p))}">
-  <div class="frame"><img src="${esc(img.src)}" alt="${esc(img.alt)}" loading="${i < 2 ? "eager" : "lazy"}" width="1200" height="900"></div>
+  <div class="frame"><img src="${esc(img.src)}" alt="${esc(img.alt)}" loading="${i < 2 ? "eager" : "lazy"}" width="1200" height="900"${img.fit === "contain" ? ' class="contain"' : ""}></div>
   <div class="meta"><span class="pill">${esc(p.category)}</span>${p.sample ? '<span class="pill sample">Example pick</span>' : ""}</div>
   <${h}>${esc(p.title)}</${h}>
   ${p.product ? `<p class="product">${esc(p.product)}</p>` : ""}
@@ -139,7 +139,7 @@ function searchForm(action = "/") {
 /* ---------- home: the LLC's mission ---------- */
 function home() {
   const latest = picks.slice(0, 3);
-  const stack = latest.map((p) => `<a href="${pickPath(p)}" aria-label="${esc(p.title)}"><img src="${esc(p.images[0].src)}" alt="" width="800" height="600" loading="eager"></a>`).join("");
+  const stack = latest.map((p) => `<a href="${pickPath(p)}" aria-label="${esc(p.title)}"><img src="${esc(p.images[0].src)}" alt="" width="800" height="600" loading="eager"${p.images[0].fit === "contain" ? ' class="contain"' : ""}></a>`).join("");
   const body = `
 <header class="hero">
   <div class="wrap hero-grid">
@@ -244,7 +244,7 @@ function picksPage() {
 function pickPage(p) {
   const url = abs(pickPath(p));
   const n = Math.min(p.images.length, 3);
-  const gallery = `<div class="gallery n${n}">${p.images.slice(0, 3).map((im, i) => `<figure><img src="${esc(im.src)}" alt="${esc(im.alt)}" width="1200" height="900" loading="${i === 0 ? "eager" : "lazy"}"></figure>`).join("")}</div>`;
+  const gallery = `<div class="gallery n${n}">${p.images.slice(0, 3).map((im, i) => `<figure><img src="${esc(im.src)}" alt="${esc(im.alt)}" width="1200" height="900" loading="${i === 0 ? "eager" : "lazy"}"${im.fit === "contain" ? ' class="contain"' : ""}></figure>`).join("")}</div>`;
   const related = picks.filter((o) => o.slug !== p.slug && o.category === p.category).concat(picks.filter((o) => o.slug !== p.slug && o.category !== p.category)).slice(0, 3);
   const body = `
 <header class="pick-head">

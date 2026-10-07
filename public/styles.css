@@ -244,6 +244,8 @@ footer .fine { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--
 .gallery figure:not(:first-child) { grid-column: span 4; }
 .gallery.n1 figure:first-child { grid-column: span 12; grid-row: auto; }
 .gallery.n1 img { aspect-ratio: 16 / 9; }
+.gallery.n1 img.contain { aspect-ratio: auto; max-height: 560px; width: auto; max-width: 100%; margin: 0 auto; }
+.card .frame img.contain, .stack a img.contain, .gallery figure img.contain { object-fit: contain; background: var(--bg-2); }
 .gallery.n2 figure:not(:first-child) { grid-row: span 2; }
 .gallery.n2 figure:not(:first-child) img { aspect-ratio: auto; height: 100%; }
 .pick-body { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: clamp(28px, 5vw, 64px); align-items: start; padding-bottom: clamp(48px, 7vw, 96px); }

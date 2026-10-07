@@ -24,16 +24,9 @@
     "url": "https://amzn.to/47102Qj",
     "images": [
       {
-        "src": "https://picsum.photos/seed/fawomo-spectrum-math-table/1200/900",
-        "alt": "Spectrum Math Grade 1 workbook open on a kitchen table with a pencil"
-      },
-      {
-        "src": "https://picsum.photos/seed/fawomo-spectrum-math-page/900/900",
-        "alt": "A finished addition practice page"
-      },
-      {
-        "src": "https://picsum.photos/seed/fawomo-spectrum-math-cover/900/900",
-        "alt": "The workbook cover"
+        "src": "/img/spectrum-math-grade-1-cover.png",
+        "alt": "Spectrum Math Grade 1 workbook cover, with fact families, adding and subtracting, place value, measurement, and 2D and 3D shapes listed",
+        "fit": "contain"
       }
     ],
     "rating": 4,
