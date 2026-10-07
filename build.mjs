@@ -30,6 +30,8 @@ const abs = (u) => (/^https?:\/\//.test(u) ? u : site.baseUrl.replace(/\/$/, "")
 const buyUrl = (p) => (p.url ? p.url : `https://www.amazon.com/dp/${p.asin}/?tag=${site.associateTag}`);
 const month = (d) => new Date(d + "T12:00:00Z").toLocaleDateString("en-US", { month: "long", year: "numeric" });
 const pickPath = (p) => `/picks/${p.slug}/`;
+const srcset = (im) => im.srcset ? ` srcset="${im.srcset.map(([u, w]) => `${esc(u)} ${w}w`).join(", ")}" sizes="${esc(im.sizes || "(max-width: 720px) 90vw, 360px")}"` : "";
+const ogOf = (im) => im.og || im.src;
 const hay = (p) => [p.title, p.product, p.short, p.category, ...(p.tags || [])].join(" ");
 const slugify = (s) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const catPath = (c) => `/category/${slugify(c)}/`;
@@ -65,9 +67,16 @@ ${published ? `<meta property="article:published_time" content="${published}">` 
 <meta property="og:title" content="${esc(title || site.name)}">
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${esc(canonical)}">
-${ogImage ? `<meta property="og:image" content="${esc(abs(ogImage))}">\n<meta name="twitter:card" content="summary_large_image">` : ""}
+<meta property="og:image" content="${esc(abs(ogImage || "/img/og-default.png"))}">
+${ogImage ? "" : '<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">'}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(title || site.name)}">
+<meta name="twitter:description" content="${esc(desc)}">
 <meta name="theme-color" content="#ffffff">
-<link rel="icon" href="${favicon}">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/favicon.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -118,7 +127,7 @@ function card(p, i, { reveal = true, h = "h3" } = {}) {
   const size = i === 0 ? "lg" : i === 1 ? "md" : "";
   const img = p.images[0];
   return `<a class="card ${size} ${reveal ? "reveal" : ""}" href="${pickPath(p)}" data-category="${esc(p.category)}" data-hay="${esc(hay(p))}">
-  <div class="frame"><img src="${esc(img.src)}" alt="${esc(img.alt)}" loading="${i < 2 ? "eager" : "lazy"}" width="1200" height="900"${img.fit === "contain" ? ' class="contain"' : ""}></div>
+  <div class="frame"><img src="${esc(img.src)}"${srcset(img)} alt="${esc(img.alt)}" loading="${i < 2 ? "eager" : "lazy"}" width="1200" height="900"${img.fit === "contain" ? ' class="contain"' : ""}></div>
   <div class="meta"><span class="pill">${esc(p.category)}</span>${p.sample ? '<span class="pill sample">Example pick</span>' : ""}</div>
   <${h}>${esc(p.title)}</${h}>
   ${p.product ? `<p class="product">${esc(p.product)}</p>` : ""}
@@ -141,7 +150,7 @@ function home() {
   const feature = latest ? `
 <section class="feature band">
   <div class="col">
-    <a class="print" href="${pickPath(latest)}" aria-label="${esc(latest.title)}"><img src="${esc(latest.images[0].src)}" alt="${esc(latest.images[0].alt)}" width="600" height="600" loading="eager"${latest.images[0].fit === "contain" ? ' class="contain"' : ""}></a>
+    <a class="print" href="${pickPath(latest)}" aria-label="${esc(latest.title)}"><img src="${esc(latest.images[0].src)}"${srcset(latest.images[0])} alt="${esc(latest.images[0].alt)}" width="600" height="600" loading="eager"${latest.images[0].fit === "contain" ? ' class="contain"' : ""}></a>
     <div>
       <p class="label">The latest thing I tried</p>
       <h2><a href="${pickPath(latest)}">${esc(latest.title)}</a></h2>
@@ -180,7 +189,7 @@ ${feature}
     </div>
   </div>
 </section>`;
-  return layout({ title: "", fullTitle: site.seoTitle || site.name, desc: site.description, canonical: abs("/"), body, ogImage: picks[0]?.images[0]?.src, current: "home",
+  return layout({ title: "", fullTitle: site.seoTitle || site.name, desc: site.description, canonical: abs("/"), body, ogImage: "", current: "home",
     jsonld: [
       { "@context": "https://schema.org", "@type": "WebSite", name: site.name, url: abs("/"), potentialAction: { "@type": "SearchAction", target: `${abs("/picks/")}?q={search_term_string}`, "query-input": "required name=search_term_string" } },
       { "@context": "https://schema.org", "@type": "Person", name: site.owner, url: abs("/"), jobTitle: "Music teacher, curriculum writer, and coach", knowsAbout: ["Pedagogy", "Music education", "Curriculum design", "Learning how to learn"], worksFor: { "@type": "Organization", name: site.legalName, url: abs("/") } }
@@ -224,7 +233,7 @@ function picksPage() {
     <p class="disclosure-note reveal"><b>Plain-English disclosure:</b> ${DISCLOSURE} The full version is on the <a class="u" href="/disclosure/">disclosure page</a>.</p>
   </div>
 </section>`;
-  return layout({ title: "Things I've tried", desc: "Honest Amazon picks from a music teacher and life coach: what I bought, what happened, and who should skip it. Searchable, newest first.", canonical: abs("/picks/"), body, ogImage: picks[0]?.images[0]?.src, current: "picks",
+  return layout({ title: "Things I've tried", desc: "Things I bought and used, each with the Amazon link and why I picked it. From a music teacher who teaches people how to teach. Newest first.", canonical: abs("/picks/"), body, ogImage: picks[0] ? ogOf(picks[0].images[0]) : "", current: "picks",
     jsonld: [{ "@context": "https://schema.org", "@type": "CollectionPage", name: "Things I've tried", url: abs("/picks/"), isPartOf: { "@type": "WebSite", name: site.name, url: abs("/") } }] });
 }
 
@@ -251,7 +260,7 @@ function pickPage(p) {
         <button type="button" data-share>Share</button>
       </div>
     </div>
-    <div class="pick-photo"><img src="${esc(img.src)}" alt="${esc(img.alt)}" width="900" height="900" loading="eager"${img.fit === "contain" ? ' class="contain"' : ""}></div>
+    <div class="pick-photo"><img src="${esc(img.src)}"${srcset(img)} alt="${esc(img.alt)}" width="900" height="900" loading="eager"${img.fit === "contain" ? ' class="contain"' : ""}></div>
   </div>
 </header>
 ${more.length ? `<div class="wrap"><div class="gallery n${Math.min(more.length, 3)}">${more.slice(0, 3).map((im) => `<figure><img src="${esc(im.src)}" alt="${esc(im.alt)}" width="1200" height="900" loading="lazy"${im.fit === "contain" ? ' class="contain"' : ""}></figure>`).join("")}</div></div>` : ""}
@@ -265,7 +274,9 @@ ${p.body && p.body.length ? `<section class="pick-why">
 ${related.length ? `<section class="related band"><div class="wrap"><div class="section-head"><h2>More things I've tried</h2></div><div class="grid">${related.map((o, i) => card(o, i + 2, { reveal: false })).join("")}</div></div></section>` : ""}
 <div class="buybar"><a class="btn" href="${esc(buyUrl(p))}" target="_blank" rel="noopener sponsored">Get it on Amazon <span class="ico" aria-hidden="true">&#8599;</span></a></div>`;
   const jsonld = [
-    { "@context": "https://schema.org", "@type": "Product", name: p.product || p.title, image: p.images.map((i) => abs(i.src)), description: p.short, category: p.category },
+    { "@context": "https://schema.org", "@type": "BlogPosting", headline: p.title, description: p.short, image: p.images.map((i) => abs(ogOf(i))), datePublished: p.date, dateModified: p.updated || p.date, mainEntityOfPage: url,
+      author: { "@type": "Person", name: site.owner, url: abs("/") }, publisher: { "@type": "Organization", name: site.legalName, url: abs("/"), logo: { "@type": "ImageObject", url: abs("/favicon.png") } },
+      about: { "@type": "Product", name: p.product || p.title, image: abs(ogOf(p.images[0])), category: p.category } },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "Things I've tried", item: abs("/picks/") },
       { "@type": "ListItem", position: 2, name: p.category, item: abs(catPath(p.category)) },
@@ -273,7 +284,7 @@ ${related.length ? `<section class="related band"><div class="wrap"><div class="
   ];
   const combo = p.product && p.product !== p.title ? `${p.title}: ${p.product}` : p.title;
   const fullTitle = p.seoTitle || (combo.length <= 38 ? `${combo} | ${site.name}` : combo);
-  return layout({ title: p.title, fullTitle, desc: p.seoDescription || pickDesc(p), canonical: url, body, ogImage: img.src, jsonld, bodyClass: "has-buybar", noindex: !!p.sample, ogType: "article", published: p.date });
+  return layout({ title: p.title, fullTitle, desc: p.seoDescription || pickDesc(p), canonical: url, body, ogImage: ogOf(img), jsonld, bodyClass: "has-buybar", noindex: !!p.sample, ogType: "article", published: p.date });
 }
 
 /* ---------- disclosure ---------- */
@@ -317,8 +328,8 @@ function categoryPage(c) {
     <div class="empty" data-empty><b>Nothing here yet.</b>New picks get added as I find them.</div>
   </div>
 </section>`;
-  const real = list.some((p) => !p.sample);
-  return layout({ noindex: !real, title: `${c} picks`, desc: `${c}: honest Amazon picks from a music teacher, with who should buy each one and who should skip it.`, canonical: url, body, ogImage: list[0]?.images[0]?.src, current: "picks",
+  const real = list.filter((p) => !p.sample).length >= 2;
+  return layout({ noindex: !real, title: `${c} picks`, desc: `${c}: things I bought and used, each with the Amazon link and why I picked it.`, canonical: url, body, ogImage: list[0] ? ogOf(list[0].images[0]) : "", current: "picks",
     jsonld: [{ "@context": "https://schema.org", "@type": "CollectionPage", name: `${c} picks`, url, isPartOf: { "@type": "WebSite", name: site.name, url: abs("/") } }] });
 }
 
@@ -335,8 +346,12 @@ write("404.html", notFound());
 for (const p of picks) write(`picks/${p.slug}/index.html`, pickPage(p));
 for (const c of site.categories.filter((c) => picks.some((p) => p.category === c))) write(`category/${slugify(c)}/index.html`, categoryPage(c));
 write("search.json", JSON.stringify(picks.map((p) => ({ slug: p.slug, title: p.title, short: p.short, category: p.category, tags: p.tags, url: pickPath(p), image: p.images[0].src }))));
-const urls = [abs("/"), abs("/picks/"), abs("/disclosure/"), ...site.categories.filter((c) => picks.some((p) => p.category === c && !p.sample)).map((c) => abs(catPath(c))), ...picks.filter((p) => !p.sample).map((p) => abs(pickPath(p)))];
-write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${esc(u)}</loc></url>`).join("\n")}\n</urlset>\n`);
+const today = new Date().toISOString().slice(0, 10);
+const newest = picks[0]?.updated || picks[0]?.date || today;
+const urls = [[abs("/"), newest], [abs("/picks/"), newest], [abs("/disclosure/"), site.disclosureUpdated || "2026-10-06"],
+  ...site.categories.filter((c) => picks.filter((p) => p.category === c && !p.sample).length >= 2).map((c) => [abs(catPath(c)), newest]),
+  ...picks.filter((p) => !p.sample).map((p) => [abs(pickPath(p)), p.updated || p.date])];
+write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(([u, d]) => `  <url><loc>${esc(u)}</loc><lastmod>${d}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 write("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${abs("/sitemap.xml")}\n`);
 
 const missing = picks.filter((p) => !p.url && (!p.asin || /SAMPLE/.test(p.asin)));

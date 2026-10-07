@@ -21,7 +21,18 @@
     "url": "https://amzn.to/47102Qj",
     "images": [
       {
-        "src": "/img/spectrum-math-grade-1-cover.png",
+        "src": "/img/spectrum-math-grade-1-cover-900.webp",
+        "srcset": [
+          [
+            "/img/spectrum-math-grade-1-cover-480.webp",
+            480
+          ],
+          [
+            "/img/spectrum-math-grade-1-cover-900.webp",
+            900
+          ]
+        ],
+        "og": "/img/spectrum-math-grade-1-cover.png",
         "alt": "Spectrum Math Grade 1 workbook cover",
         "fit": "contain"
       }
@@ -50,6 +61,8 @@
           "Brain Quest Math 1st Grade is the fun one: stickers, a progress map, activities instead of rows of problems. School Zone Big Math 1-2 is the most pages for the money. Math Mammoth and Math with Confidence are the ones homeschool parents swear by, and they ask more of you as the teacher."
         ]
       }
-    ]
+    ],
+    "seoTitle": "Spectrum Math Grade 1: my first grade math workbook pick",
+    "updated": "2026-10-07"
   }
 ]
