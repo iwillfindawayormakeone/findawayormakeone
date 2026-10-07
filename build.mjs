@@ -139,7 +139,7 @@ function searchForm(action = "/") {
 /* ---------- home: the LLC's mission ---------- */
 function home() {
   const latest = picks.slice(0, 3);
-  const stack = latest.map((p) => `<a href="${pickPath(p)}" aria-label="${esc(p.title)}"><img src="${esc(p.images[0].src)}" alt="" width="800" height="600" loading="eager"${p.images[0].fit === "contain" ? ' class="contain"' : ""}></a>`).join("");
+  const stack = [...latest].reverse().map((p) => `<a href="${pickPath(p)}" aria-label="${esc(p.title)}"><img src="${esc(p.images[0].src)}" alt="" width="800" height="600" loading="eager"${p.images[0].fit === "contain" ? ' class="contain"' : ""}></a>`).join("");
   const body = `
 <header class="hero">
   <div class="wrap hero-grid">
