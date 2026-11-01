@@ -43,6 +43,8 @@ You can also do all of that yourself: edit `data/products.json`, run `node build
 | `body` | Sections: Why I bought it / What actually happened / What to know before you buy / Who it is for. |
 | `verdict.buy`, `verdict.skip` | One sentence each. The skip line is what makes people trust the buy line. |
 | `sample` | `true` marks it as an example (yellow badge, hidden from search engines). Delete or set `false` for real picks. |
+| `gifted` | `true` if the brand sent it free. Adds a "Sent to me free" label and note at the top (FTC). |
+| `youtube` | Optional YouTube video ID. Embeds the video above the details. |
 | `hidden` | `true` removes it from the site without deleting the entry. |
 
 ### `data/site.json`

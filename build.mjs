@@ -103,7 +103,7 @@ ${body}
     <div class="cols">
       <div>
         <p><b>${esc(site.name)}</b></p>
-        <p class="legal">${DISCLOSURE} Every product link on this site is an affiliate link. I only list things I bought with my own money and would buy again. Prices and availability change on Amazon; this site never shows a price for that reason.</p>
+        <p class="legal">${DISCLOSURE} Every product link on this site is an affiliate link. I only list things I've actually used and would tell a friend about. If a brand sent it free, the page says so. Prices and availability change on Amazon; this site never shows a price for that reason.</p>
       </div>
       <div>
         <div class="links">
@@ -185,7 +185,7 @@ ${feature}
     <div class="steps reveal">
       <div><h3>Teaching teachers</h3><p>Curriculum for schools, clinics, workshops, and professional development. Pedagogy is the center of everything here: how a person actually learns a thing, and how to tell when they have. ${site.contactEmail ? `Reach me at <a class="u" href="mailto:${esc(site.contactEmail)}">${esc(site.contactEmail)}</a>.` : "Booking details are coming soon."}</p></div>
       <div><h3>Coaching</h3><p>One on one, for people who know what they want and keep not doing it. We find the way that fits your actual life, or we make one. Same method as the classroom: short lessons, real reps, honest feedback.</p></div>
-      <div><h3>Things I've tried</h3><p>Things I bought and used, with the link and why I picked each one. Some links pay me a small commission. Every one says so. <a class="u" href="/picks/">See the list</a>.</p></div>
+      <div id="how"><h3>Things I've tried</h3><p>Things I bought and used, with the link and why I picked each one. Some links pay me a small commission. Every one says so. <a class="u" href="/picks/">See the list</a>.</p></div>
     </div>
   </div>
 </section>`;
@@ -204,7 +204,7 @@ function picksPage() {
   <div class="wrap">
     <div class="crumb"><a href="/">&larr; Home</a></div>
     <h1 class="rise">Things I've tried, and would tell a <em>friend</em> about.</h1>
-    <p class="lede rise d1">Every product here has been on my desk, in my classroom, or in my house first. Search it, or browse by category.</p>
+    <p class="lede rise d1">Every product here has been on my desk or in my house first. Search it, or browse by category.</p>
     <div class="rise d2">${searchForm("/picks/")}</div>
     <div class="chips rise d3">${chips}</div>
   </div>
@@ -226,7 +226,7 @@ function picksPage() {
   <div class="wrap">
     <div class="section-head reveal"><h2>How a thing ends up on this list</h2></div>
     <div class="steps reveal">
-      <div><h3>I buy it first.</h3><p>With my own money, for my own classroom, kids, or desk. Nobody sends me free stuff, and I would say so if they did.</p></div>
+      <div><h3>I use it first.</h3><p>On my own desk, with my own kids, in my own house. Most of it I bought. If a brand sent it to me free, the page says so at the top.</p></div>
       <div><h3>I write what actually happened.</h3><p>Not the box copy. What broke, what surprised me, what I would tell you if you asked me in the hallway.</p></div>
       <div><h3>You click, you decide.</h3><p>Every link goes to Amazon. If you buy, I earn a small commission and you pay exactly the same price. That is how this site pays for itself.</p></div>
     </div>
@@ -250,7 +250,8 @@ function pickPage(p) {
   <div class="col">
     <div class="pick-text">
       <div class="crumb"><a href="/picks/">&larr; Things I've tried</a></div>
-      <div class="meta"><a class="pill" href="${catPath(p.category)}">${esc(p.category)}</a></div>
+      ${p.gifted ? `<p class="sample-note">The brand sent me this one free to review. I wrote it the same way I write about things I buy, and the link still pays me a commission.</p>` : ""}
+      <div class="meta"><a class="pill" href="${catPath(p.category)}">${esc(p.category)}</a>${p.gifted ? '<span class="pill sample">Sent to me free</span>' : ""}</div>
       <h1>${esc(p.title)}</h1>
       ${p.product ? `<p class="product-line">${esc(p.product)}</p>` : ""}
       ${(p.intro || [p.short]).map((t) => `<p class="intro">${esc(t)}</p>`).join("")}
@@ -266,7 +267,7 @@ function pickPage(p) {
 ${more.length ? `<div class="wrap"><div class="gallery n${Math.min(more.length, 3)}">${more.slice(0, 3).map((im) => `<figure><img src="${esc(im.src)}" alt="${esc(im.alt)}" width="1200" height="900" loading="lazy"${im.fit === "contain" ? ' class="contain"' : ""}></figure>`).join("")}</div></div>` : ""}
 ${p.body && p.body.length ? `<section class="pick-why">
   <div class="col">
-    <p class="more-intro">If you want the details, here they are.</p>
+    <p class="more-intro">If you want the details, here they are.</p>${p.youtube ? `\n    <div class="video"><iframe src="https://www.youtube-nocookie.com/embed/${esc(p.youtube)}" title="${esc(p.title)} video" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>` : ""}
     ${p.body.map((sec) => `<h2>${esc(sec.h)}</h2>${sec.p.map((t) => `<p>${esc(t)}</p>`).join("")}`).join("\n")}
     <div class="again">${buy}</div>
   </div>
@@ -297,8 +298,8 @@ function disclosure() {
     <p>${site.name} is run by ${esc(site.legalName)}. The product links on this site are Amazon affiliate links. When you click one and buy something, Amazon pays me a small percentage. You pay exactly the same price you would have paid anyway. That commission is how this site covers its own costs.</p>
     <h2>What that does not change</h2>
     <ul>
-      <li>I buy everything listed here myself. Nothing on this site was sent to me for free, and if that ever changes the pick will say so at the top.</li>
-      <li>Nobody pays to be listed. A company cannot buy a spot, and I do not take requests from brands.</li>
+      <li>Most things here I bought myself. Sometimes a brand sends me something free to review. When that happens, the page says so at the top.</li>
+      <li>Some brands pay a bonus on top of Amazon's commission for a while. That doesn't change what I write. Nobody can pay for a good review.</li>
       <li>I write the "skip it if" part as carefully as the "buy it if" part. A pick that is wrong for you is not worth the commission.</li>
     </ul>
     <h2>Why there are no prices</h2>
