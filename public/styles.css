@@ -297,3 +297,21 @@ footer .fine { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--
   .buy-list.compact .buy-row { grid-template-columns: 64px minmax(0, 1fr); }
   .steps.six { grid-template-columns: 1fr; }
 }
+
+/* ---------- cruise: story / facts switch ---------- */
+.mode { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 22px; padding: 6px 6px 6px 14px; border-radius: 999px; background: var(--bg-2); }
+.mode-label { font-size: 0.84rem; font-weight: 700; color: var(--ink-2); margin-right: 4px; }
+.mode button { padding: 9px 16px; border-radius: 999px; font-size: 0.9rem; font-weight: 700; color: var(--ink-2); transition: background 0.4s var(--ease), color 0.4s var(--ease); }
+.mode button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.mode-note { margin-top: 14px; font-size: 0.95rem; color: var(--ink-2); max-width: 62ch; }
+.fact { display: none; }
+.facts-list { margin-bottom: 18px; }
+.facts-list.bad li::before { content: "\2715"; color: #c0392b; }
+body.facts .story { display: none; }
+body.facts .fact { display: block; }
+body.facts .walk .fact { padding: 12px 16px; border-radius: var(--radius-s); background: var(--bg-2); font-size: 1.02rem; }
+body.facts #balcony .fact { font-size: 1.05rem; }
+body.facts .facts-list { margin-bottom: 0; }
+body.facts .walk .didnt { display: none; }
+body.facts .lede.story:first-of-type { display: block; }
+#ducks h2, #people h2, #skip-this h2 { margin-bottom: 14px; }

@@ -192,7 +192,7 @@ ${feature}
     <div class="promo reveal">
       <div>
         <p class="label">New</p>
-        <h2><a href="${cruise.path}">First Carnival cruise? Here's what I wish someone had told me.</a></h2>
+        <h2><a href="${cruise.path}">${esc(cruise.title)}</a></h2>
         <p>We took our first cruise this August: Baltimore to Bermuda, two adults, two little kids. What I packed, what actually happens the first hour on the ship, and what I'd buy again.</p>
         <a class="btn" href="${cruise.path}">Read the cruise guide <span class="ico" aria-hidden="true">&rarr;</span></a>
       </div>
@@ -387,11 +387,17 @@ function cruisePage() {
 <header class="hero list cruise-hero">
   <div class="wrap">
     <div class="crumb"><a href="/">&larr; Home</a></div>
-    <h1 class="rise">First Carnival cruise? Here's what I wish someone <em>had told me.</em></h1>
-    ${cruise.intro.map((t, i) => `<p class="lede rise d${i + 1}">${esc(t)}</p>`).join("")}
+    <h1 class="rise">${esc(cruise.h1[0])}<em>${esc(cruise.h1[1])}</em></h1>
+    ${cruise.intro.map((t, i) => `<p class="lede story rise d${Math.min(i + 1, 3)}">${esc(t)}</p>`).join("")}
     <p class="context rise d3"><b>The trip:</b> ${esc(cruise.context)}</p>
+    <div class="mode rise d3" data-mode-switch role="group" aria-label="${esc(cruise.modes.label)}">
+      <span class="mode-label">${esc(cruise.modes.label)}</span>
+      <button type="button" data-mode="story" aria-pressed="true">${esc(cruise.modes.story)}</button>
+      <button type="button" data-mode="facts" aria-pressed="false">${esc(cruise.modes.facts)}</button>
+    </div>
+    <p class="mode-note story rise d3">${esc(cruise.modes.note)}</p>
     <nav class="jump rise d3" aria-label="On this page">
-      <a href="#buy">What to buy</a><a href="#carry">Carry-on</a><a href="#first-hour">First hour</a><a href="#kids">With kids</a><a href="#balcony">Balcony?</a><a href="#days">Day by day</a>
+      <a href="#buy">What to buy</a><a href="#carry">Carry-on</a><a href="#first-hour">First hour</a><a href="#ducks">Doors &amp; ducks</a><a href="#skip-this">Skip this</a><a href="#kids">With kids</a><a href="#balcony">Balcony?</a><a href="#days">Day by day</a>
     </nav>
   </div>
 </header>
@@ -420,27 +426,53 @@ function cruisePage() {
     <div class="section-head"><h2>${esc(cruise.firstHead)}</h2><p>${esc(cruise.firstIntro)}</p></div>
     <ol class="walk">${cruise.steps.map((st, i) => `<li>
       <h3><span class="num">${i + 1}</span>${esc(st.h)}</h3>
-      ${st.p.map((t) => `<p>${esc(t)}</p>`).join("")}
+      ${st.fact ? `<p class="fact">${esc(st.fact)}</p>` : ""}
+      ${st.p.map((t) => `<p class="story">${esc(t)}</p>`).join("")}
       ${st.tip ? `<p class="didnt"><b>I didn't know that:</b> ${esc(st.tip)}</p>` : ""}
     </li>`).join("")}</ol>
   </div>
 </section>
 
-<section id="kids" class="band">
+<section id="ducks" class="band">
+  <div class="col">
+    <h2>${esc(cruise.ducksHead)}</h2>
+    <ul class="checks facts-list">${cruise.ducksFacts.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+    <div class="prose-lg story">${cruise.ducks.map((t) => `<p>${esc(t)}</p>`).join("")}</div>
+  </div>
+</section>
+
+<section id="people">
+  <div class="col">
+    <h2>${esc(cruise.peopleHead)}</h2>
+    <ul class="checks facts-list">${cruise.peopleFacts.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+    <div class="prose-lg story">${cruise.people.map((t) => `<p>${esc(t)}</p>`).join("")}</div>
+  </div>
+</section>
+
+<section id="skip-this" class="band">
+  <div class="col">
+    <h2>${esc(cruise.badHead)}</h2>
+    <ul class="checks facts-list bad">${cruise.badFacts.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+    <div class="prose-lg story">${cruise.bad.map((t) => `<p>${esc(t)}</p>`).join("")}</div>
+  </div>
+</section>
+
+<section id="kids">
   <div class="wrap">
     <div class="section-head"><h2>${esc(cruise.familyHead)}</h2></div>
     <div class="steps six">${cruise.family.map(([k, v]) => `<div><h3>${esc(k)}</h3><p>${esc(v)}</p></div>`).join("")}</div>
   </div>
 </section>
 
-<section id="balcony">
+<section id="balcony" class="band">
   <div class="col prose-lg">
     <h2>${esc(cruise.balconyHead)}</h2>
-    ${cruise.balcony.map((t) => `<p>${esc(t)}</p>`).join("")}
+    ${cruise.balcony.map((t) => `<p class="story">${esc(t)}</p>`).join("")}
+    <p class="fact">Worth it for us. Private outside space with little kids, coffee with the ocean, watching the island come up. Beds can be reconfigured by the steward; ask day one. The bigger family question is one cabin vs. two (second bathroom).</p>
   </div>
 </section>
 
-<section id="days" class="band">
+<section id="days">
   <div class="col">
     <div class="section-head"><h2>${esc(cruise.daysHead)}</h2><p>${esc(cruise.daysIntro)}</p></div>
     <div class="days">${cruise.days.map((d) => `<div><h3>${esc(d.d)}</h3>${d.p.map((t) => `<p>${esc(t)}</p>`).join("")}</div>`).join("")}</div>

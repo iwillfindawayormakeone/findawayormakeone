@@ -104,4 +104,20 @@
 
   var y = document.querySelector("[data-year]");
   if (y) y.textContent = new Date().getFullYear();
+
+  // ---- cruise guide: story vs. facts (per-viewer, remembered in this browser only) ----
+  var modeSwitch = document.querySelector("[data-mode-switch]");
+  if (modeSwitch) {
+    var btns = modeSwitch.querySelectorAll("[data-mode]");
+    function setMode(m) {
+      document.body.classList.toggle("facts", m === "facts");
+      btns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-mode") === m)); });
+      try { localStorage.setItem("cruise-mode", m); } catch (e) {}
+    }
+    var saved = "story";
+    try { saved = localStorage.getItem("cruise-mode") || "story"; } catch (e) {}
+    if (new URLSearchParams(location.search).get("mode") === "facts") saved = "facts";
+    setMode(saved);
+    btns.forEach(function (b) { b.addEventListener("click", function () { setMode(b.getAttribute("data-mode")); }); });
+  }
 })();
