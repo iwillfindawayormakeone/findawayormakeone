@@ -4,6 +4,7 @@
 */
 import fs from "node:fs";
 import path from "node:path";
+import cruise from "./data/cruise.mjs";
 
 const root = path.dirname(new URL(import.meta.url).pathname);
 const read = (p) => JSON.parse(fs.readFileSync(path.join(root, p), "utf8"));
@@ -31,7 +32,12 @@ const buyUrl = (p) => (p.url ? p.url : `https://www.amazon.com/dp/${p.asin}/?tag
 const month = (d) => new Date(d + "T12:00:00Z").toLocaleDateString("en-US", { month: "long", year: "numeric" });
 const pickPath = (p) => `/picks/${p.slug}/`;
 const srcset = (im) => im.srcset ? ` srcset="${im.srcset.map(([u, w]) => `${esc(u)} ${w}w`).join(", ")}" sizes="${esc(im.sizes || "(max-width: 720px) 90vw, 360px")}"` : "";
-const ogOf = (im) => im.og || im.src;
+const ogOf = (im) => (im ? im.og || im.src : "/img/og-default.png");
+const img0 = (p) => (p.images && p.images.length ? p.images[0] : null);
+const hue = (s) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
+// No photo yet: a quiet tile with the product's initial. Amazon's images may not be used, so pages launch without photos until JD adds his own.
+const placeholder = (p, cls = "") => `<div class="ph ${cls}" style="--h:${hue(p.slug)}" aria-hidden="true"><span>${esc(p.title.replace(/^(a|an|the|why|my|this|the)\s+/i, "").trim()[0].toUpperCase())}</span></div>`;
+const videoUrl = (p) => p.videoUrl || (p.video ? `https://www.amazon.com/shop/findawaytosing/video/amzn1.vse.video.${p.video}?tag=${site.associateTag}` : "");
 const hay = (p) => [p.title, p.product, p.short, p.category, ...(p.tags || [])].join(" ");
 const slugify = (s) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const catPath = (c) => `/category/${slugify(c)}/`;
@@ -91,6 +97,7 @@ ${jsonld.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</sc
     <a class="wordmark" href="/"><span class="mark" aria-hidden="true">F</span>${esc(site.name)}</a>
     <div class="nav-links">
       <a href="/picks/" ${current === "picks" ? 'aria-current="page"' : ""}>Things I've tried</a>
+      <a href="${cruise.path}" ${current === "cruise" ? 'aria-current="page"' : ""}>First cruise</a>
       <a href="/#work" class="hide-sm">Teaching</a>
       ${storefront}
       <a href="/disclosure/" class="hide-sm" ${current === "disclosure" ? 'aria-current="page"' : ""}>Disclosure</a>
@@ -108,6 +115,7 @@ ${body}
       <div>
         <div class="links">
           <a href="/picks/">Things I've tried</a>
+          <a href="${cruise.path}">First-cruise guide</a>
           <a href="/#work">Teaching and coaching</a>
           <a href="/#how">How I work</a>
           <a href="/disclosure/">Affiliate disclosure</a>
@@ -125,10 +133,10 @@ ${body}
 /* ---------- components ---------- */
 function card(p, i, { reveal = true, h = "h3" } = {}) {
   const size = i === 0 ? "lg" : i === 1 ? "md" : "";
-  const img = p.images[0];
+  const img = img0(p);
   return `<a class="card ${size} ${reveal ? "reveal" : ""}" href="${pickPath(p)}" data-category="${esc(p.category)}" data-hay="${esc(hay(p))}">
-  <div class="frame"><img src="${esc(img.src)}"${srcset(img)} alt="${esc(img.alt)}" loading="${i < 2 ? "eager" : "lazy"}" width="1200" height="900"${img.fit === "contain" ? ' class="contain"' : ""}></div>
-  <div class="meta"><span class="pill">${esc(p.category)}</span>${p.sample ? '<span class="pill sample">Example pick</span>' : ""}</div>
+  <div class="frame">${img ? `<img src="${esc(img.src)}"${srcset(img)} alt="${esc(img.alt)}" loading="${i < 2 ? "eager" : "lazy"}" width="1200" height="900"${img.fit === "contain" ? ' class="contain"' : ""}>` : placeholder(p)}</div>
+  <div class="meta"><span class="pill">${esc(p.category)}</span>${p.video ? '<span class="pill muted">Video</span>' : ""}${p.sample ? '<span class="pill sample">Example pick</span>' : ""}</div>
   <${h}>${esc(p.title)}</${h}>
   ${p.product ? `<p class="product">${esc(p.product)}</p>` : ""}
   <p>${esc(p.short)}</p>
@@ -150,7 +158,7 @@ function home() {
   const feature = latest ? `
 <section class="feature band">
   <div class="col">
-    <a class="print" href="${pickPath(latest)}" aria-label="${esc(latest.title)}"><img src="${esc(latest.images[0].src)}"${srcset(latest.images[0])} alt="${esc(latest.images[0].alt)}" width="600" height="600" loading="eager"${latest.images[0].fit === "contain" ? ' class="contain"' : ""}></a>
+    <a class="print" href="${pickPath(latest)}" aria-label="${esc(latest.title)}">${img0(latest) ? `<img src="${esc(img0(latest).src)}"${srcset(img0(latest))} alt="${esc(img0(latest).alt)}" width="600" height="600" loading="eager"${img0(latest).fit === "contain" ? ' class="contain"' : ""}>` : placeholder(latest, "sq")}</a>
     <div>
       <p class="label">The latest thing I tried</p>
       <h2><a href="${pickPath(latest)}">${esc(latest.title)}</a></h2>
@@ -179,6 +187,26 @@ function home() {
   </div>
 </header>
 ${feature}
+<section class="cruise-promo">
+  <div class="wrap">
+    <div class="promo reveal">
+      <div>
+        <p class="label">New</p>
+        <h2><a href="${cruise.path}">First Carnival cruise? Here's what I wish someone had told me.</a></h2>
+        <p>We took our first cruise this August: Baltimore to Bermuda, two adults, two little kids. What I packed, what actually happens the first hour on the ship, and what I'd buy again.</p>
+        <a class="btn" href="${cruise.path}">Read the cruise guide <span class="ico" aria-hidden="true">&rarr;</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="browse">
+  <div class="wrap">
+    <div class="section-head reveal"><h2>Browse by category</h2><p>${picks.length} things, each with the link and why I picked it.</p></div>
+    <div class="cats reveal">
+      ${site.categories.filter((c) => picks.some((p) => p.category === c)).map((c) => `<a href="${catPath(c)}"><b>${esc(c)}</b><span>${picks.filter((p) => p.category === c).length} picks</span></a>`).join("")}
+    </div>
+  </div>
+</section>
 <section id="work">
   <div class="wrap">
     <div class="section-head reveal"><h2>What I do</h2></div>
@@ -233,51 +261,57 @@ function picksPage() {
     <p class="disclosure-note reveal"><b>Plain-English disclosure:</b> ${DISCLOSURE} The full version is on the <a class="u" href="/disclosure/">disclosure page</a>.</p>
   </div>
 </section>`;
-  return layout({ title: "Things I've tried", desc: "Things I bought and used, each with the Amazon link and why I picked it. From a music teacher who teaches people how to teach. Newest first.", canonical: abs("/picks/"), body, ogImage: picks[0] ? ogOf(picks[0].images[0]) : "", current: "picks",
+  return layout({ title: "Things I've tried", desc: "Things I bought and used, each with the Amazon link and why I picked it. From a music teacher who teaches people how to teach. Newest first.", canonical: abs("/picks/"), body, ogImage: picks[0] ? ogOf(img0(picks[0])) : "", current: "picks",
     jsonld: [{ "@context": "https://schema.org", "@type": "CollectionPage", name: "Things I've tried", url: abs("/picks/"), isPartOf: { "@type": "WebSite", name: site.name, url: abs("/") } }] });
 }
 
 /* ---------- pick page: the link first, the story second ---------- */
 function pickPage(p) {
   const url = abs(pickPath(p));
-  const img = p.images[0];
-  const more = p.images.slice(1);
-  const related = picks.filter((o) => o.slug !== p.slug).slice(0, 3);
+  const img = img0(p);
+  const more = (p.images || []).slice(1);
+  const sameVideo = p.video ? picks.filter((o) => o.slug !== p.slug && o.video === p.video) : [];
+  const related = [...sameVideo, ...picks.filter((o) => o.slug !== p.slug && o.category === p.category && !sameVideo.includes(o)), ...picks.filter((o) => o.slug !== p.slug && o.category !== p.category)].filter((o, i, a) => a.indexOf(o) === i).slice(0, 3);
+  const vurl = videoUrl(p);
+  const watch = vurl ? `<a class="btn ghost" href="${esc(vurl)}" target="_blank" rel="noopener sponsored">Watch my video on Amazon <span class="ico" aria-hidden="true">&#9654;</span></a>` : "";
   const buy = `<a class="btn big" href="${esc(buyUrl(p))}" target="_blank" rel="noopener sponsored">Get it on Amazon <span class="ico" aria-hidden="true">&#8599;</span></a>
       <p class="aff">${AFF_LINE}</p>`;
   const body = `
 <header class="pick-head">
   <div class="col">
     <div class="pick-text">
-      <div class="crumb"><a href="/picks/">&larr; Things I've tried</a></div>
+      <div class="crumb"><a href="${p.category === "Cruise & travel" ? cruise.path : "/picks/"}">&larr; ${p.category === "Cruise & travel" ? "First-cruise guide" : "Things I've tried"}</a></div>
       ${p.gifted ? `<p class="sample-note">The brand sent me this one free to review. I wrote it the same way I write about things I buy, and the link still pays me a commission.</p>` : ""}
-      <div class="meta"><a class="pill" href="${catPath(p.category)}">${esc(p.category)}</a>${p.gifted ? '<span class="pill sample">Sent to me free</span>' : ""}</div>
+      <div class="meta"><a class="pill" href="${catPath(p.category)}">${esc(p.category)}</a>${p.gifted ? '<span class="pill sample">Sent to me free</span>' : ""}${p.ideaList ? `<span class="pill muted">From my "${esc(p.ideaList)}" list</span>` : ""}</div>
       <h1>${esc(p.title)}</h1>
       ${p.product ? `<p class="product-line">${esc(p.product)}</p>` : ""}
       ${(p.intro || [p.short]).map((t) => `<p class="intro">${esc(t)}</p>`).join("")}
       ${buy}
+      ${watch ? `<div class="watch">${watch}</div>` : ""}
       <div class="share">
         <button type="button" data-copy>Copy link</button>
         <button type="button" data-share>Share</button>
       </div>
     </div>
-    <div class="pick-photo"><img src="${esc(img.src)}"${srcset(img)} alt="${esc(img.alt)}" width="900" height="900" loading="eager"${img.fit === "contain" ? ' class="contain"' : ""}></div>
+    ${img ? `<div class="pick-photo"><img src="${esc(img.src)}"${srcset(img)} alt="${esc(img.alt)}" width="900" height="900" loading="eager"${img.fit === "contain" ? ' class="contain"' : ""}></div>` : ""}
   </div>
 </header>
 ${more.length ? `<div class="wrap"><div class="gallery n${Math.min(more.length, 3)}">${more.slice(0, 3).map((im) => `<figure><img src="${esc(im.src)}" alt="${esc(im.alt)}" width="1200" height="900" loading="lazy"${im.fit === "contain" ? ' class="contain"' : ""}></figure>`).join("")}</div></div>` : ""}
-${p.body && p.body.length ? `<section class="pick-why">
+${(p.body && p.body.length) || vurl ? `<section class="pick-why">
   <div class="col">
-    <p class="more-intro">If you want the details, here they are.</p>${p.youtube ? `\n    <div class="video"><iframe src="https://www.youtube-nocookie.com/embed/${esc(p.youtube)}" title="${esc(p.title)} video" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>` : ""}
-    ${p.body.map((sec) => `<h2>${esc(sec.h)}</h2>${sec.p.map((t) => `<p>${esc(t)}</p>`).join("")}`).join("\n")}
+    ${p.body && p.body.length ? `<p class="more-intro">If you want the details, here they are.</p>` : ""}${p.youtube ? `\n    <div class="video"><iframe src="https://www.youtube-nocookie.com/embed/${esc(p.youtube)}" title="${esc(p.title)} video" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>` : ""}
+    ${(p.body || []).map((sec) => `<h2>${esc(sec.h)}</h2>${sec.p.map((t) => `<p>${esc(t)}</p>`).join("")}`).join("\n")}
+    ${vurl ? `<h2>The video</h2><p>I made a video about this one. Amazon shows it on the product page, so the link below opens it there.</p><p>${watch}</p>` : ""}
+    ${sameVideo.length ? `<h2>Also in that video</h2><p>${sameVideo.map((o) => `<a class="u" href="${pickPath(o)}">${esc(o.product || o.title)}</a>`).join(", ")}.</p>` : ""}
     <div class="again">${buy}</div>
   </div>
 </section>` : ""}
 ${related.length ? `<section class="related band"><div class="wrap"><div class="section-head"><h2>More things I've tried</h2></div><div class="grid">${related.map((o, i) => card(o, i + 2, { reveal: false })).join("")}</div></div></section>` : ""}
 <div class="buybar"><a class="btn" href="${esc(buyUrl(p))}" target="_blank" rel="noopener sponsored">Get it on Amazon <span class="ico" aria-hidden="true">&#8599;</span></a></div>`;
   const jsonld = [
-    { "@context": "https://schema.org", "@type": "BlogPosting", headline: p.title, description: p.short, image: p.images.map((i) => abs(ogOf(i))), datePublished: p.date, dateModified: p.updated || p.date, mainEntityOfPage: url,
+    { "@context": "https://schema.org", "@type": "BlogPosting", headline: p.title, description: p.short, image: (p.images && p.images.length ? p.images : [null]).map((i) => abs(ogOf(i))), datePublished: p.date, dateModified: p.updated || p.date, mainEntityOfPage: url,
       author: { "@type": "Person", name: site.owner, url: abs("/") }, publisher: { "@type": "Organization", name: site.legalName, url: abs("/"), logo: { "@type": "ImageObject", url: abs("/favicon.png") } },
-      about: { "@type": "Product", name: p.product || p.title, image: abs(ogOf(p.images[0])), category: p.category } },
+      about: { "@type": "Product", name: p.product || p.title, image: abs(ogOf(img)), category: p.category } },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "Things I've tried", item: abs("/picks/") },
       { "@type": "ListItem", position: 2, name: p.category, item: abs(catPath(p.category)) },
@@ -320,7 +354,7 @@ function categoryPage(c) {
   <div class="wrap">
     <div class="crumb"><a href="/picks/">&larr; Things I've tried</a></div>
     <h1>${esc(c)}</h1>
-    <p class="short">${list.length === 1 ? "One pick" : list.length + " picks"} in this category. Each one has the link and why I picked it.</p>
+    <p class="short">${list.length === 1 ? "One pick" : list.length + " picks"} in this category. Each one has the link and why I picked it.${c === "Cruise & travel" ? ` Start with the <a class="u" href="${cruise.path}">first-cruise guide</a>.` : ""}</p>
   </div>
 </header>
 <section id="picks" style="padding-top:0">
@@ -330,8 +364,101 @@ function categoryPage(c) {
   </div>
 </section>`;
   const real = list.filter((p) => !p.sample).length >= 2;
-  return layout({ noindex: !real, title: `${c} picks`, desc: `${c}: things I bought and used, each with the Amazon link and why I picked it.`, canonical: url, body, ogImage: list[0] ? ogOf(list[0].images[0]) : "", current: "picks",
+  return layout({ noindex: !real, title: `${c} picks`, desc: `${c}: things I bought and used, each with the Amazon link and why I picked it.`, canonical: url, body, ogImage: list[0] ? ogOf(img0(list[0])) : "", current: "picks",
     jsonld: [{ "@context": "https://schema.org", "@type": "CollectionPage", name: `${c} picks`, url, isPartOf: { "@type": "WebSite", name: site.name, url: abs("/") } }] });
+}
+
+/* ---------- cruise guide ---------- */
+function cruisePage() {
+  const url = abs(cruise.path);
+  const list = picks.filter((p) => p.category === "Cruise & travel").sort((a, b) => (a.cruiseRank || 99) - (b.cruiseRank || 99));
+  const top = list.filter((p) => (p.cruiseRank || 99) <= 11);
+  const rest = list.filter((p) => (p.cruiseRank || 99) > 11);
+  const row = (p, i) => `<li class="buy-row">
+    <a class="thumb" href="${pickPath(p)}" aria-label="${esc(p.title)}">${img0(p) ? `<img src="${esc(img0(p).src)}" alt="${esc(img0(p).alt)}" loading="lazy" width="300" height="300">` : placeholder(p, "sq")}</a>
+    <div class="txt">
+      <h3>${i != null ? `<span class="num">${i + 1}</span>` : ""}<a href="${pickPath(p)}">${esc(p.title)}</a></h3>
+      <p class="product">${esc(p.product)}</p>
+      <p>${esc(p.short)}</p>
+      <div class="row-ctas"><a class="btn" href="${esc(buyUrl(p))}" target="_blank" rel="noopener sponsored">Get it on Amazon <span class="ico" aria-hidden="true">&#8599;</span></a><a class="u" href="${pickPath(p)}">Why I packed it</a></div>
+    </div>
+  </li>`;
+  const body = `
+<header class="hero list cruise-hero">
+  <div class="wrap">
+    <div class="crumb"><a href="/">&larr; Home</a></div>
+    <h1 class="rise">First Carnival cruise? Here's what I wish someone <em>had told me.</em></h1>
+    ${cruise.intro.map((t, i) => `<p class="lede rise d${i + 1}">${esc(t)}</p>`).join("")}
+    <p class="context rise d3"><b>The trip:</b> ${esc(cruise.context)}</p>
+    <nav class="jump rise d3" aria-label="On this page">
+      <a href="#buy">What to buy</a><a href="#carry">Carry-on</a><a href="#first-hour">First hour</a><a href="#kids">With kids</a><a href="#balcony">Balcony?</a><a href="#days">Day by day</a>
+    </nav>
+  </div>
+</header>
+
+<section id="buy">
+  <div class="wrap">
+    <div class="section-head reveal"><h2>${esc(cruise.buyHead)}</h2><p>${esc(cruise.buyIntro)}</p></div>
+    <ol class="buy-list reveal">${top.map((p, i) => row(p, i)).join("")}</ol>
+    <h3 class="sub reveal">${esc(cruise.restHead)}</h3>
+    <ul class="buy-list compact reveal">${rest.map((p) => row(p, null)).join("")}</ul>
+    <h3 class="sub reveal">${esc(cruise.skipHead)}</h3>
+    <dl class="skip reveal">${cruise.skip.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+    <p class="disclosure-note reveal"><b>Plain-English disclosure:</b> ${DISCLOSURE} I bought all of this myself the week before we left.</p>
+  </div>
+</section>
+
+<section id="carry" class="band">
+  <div class="col">
+    <div class="section-head"><h2>${esc(cruise.carryOn.head)}</h2><p>${esc(cruise.carryOn.why)}</p></div>
+    <ul class="checks">${cruise.carryOn.items.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+  </div>
+</section>
+
+<section id="first-hour">
+  <div class="col">
+    <div class="section-head"><h2>${esc(cruise.firstHead)}</h2><p>${esc(cruise.firstIntro)}</p></div>
+    <ol class="walk">${cruise.steps.map((st, i) => `<li>
+      <h3><span class="num">${i + 1}</span>${esc(st.h)}</h3>
+      ${st.p.map((t) => `<p>${esc(t)}</p>`).join("")}
+      ${st.tip ? `<p class="didnt"><b>I didn't know that:</b> ${esc(st.tip)}</p>` : ""}
+    </li>`).join("")}</ol>
+  </div>
+</section>
+
+<section id="kids" class="band">
+  <div class="wrap">
+    <div class="section-head"><h2>${esc(cruise.familyHead)}</h2></div>
+    <div class="steps six">${cruise.family.map(([k, v]) => `<div><h3>${esc(k)}</h3><p>${esc(v)}</p></div>`).join("")}</div>
+  </div>
+</section>
+
+<section id="balcony">
+  <div class="col prose-lg">
+    <h2>${esc(cruise.balconyHead)}</h2>
+    ${cruise.balcony.map((t) => `<p>${esc(t)}</p>`).join("")}
+  </div>
+</section>
+
+<section id="days" class="band">
+  <div class="col">
+    <div class="section-head"><h2>${esc(cruise.daysHead)}</h2><p>${esc(cruise.daysIntro)}</p></div>
+    <div class="days">${cruise.days.map((d) => `<div><h3>${esc(d.d)}</h3>${d.p.map((t) => `<p>${esc(t)}</p>`).join("")}</div>`).join("")}</div>
+  </div>
+</section>
+
+<section id="verify">
+  <div class="col">
+    <h2>${esc(cruise.verifyHead)}</h2>
+    <p>${esc(cruise.verify)}</p>
+    <p style="margin-top:18px"><a class="btn ghost" href="${catPath("Cruise & travel")}">Everything I packed, as a list <span class="ico" aria-hidden="true">&rarr;</span></a></p>
+  </div>
+</section>`;
+  return layout({ title: "First-time Carnival cruise guide", fullTitle: cruise.seoTitle, desc: cruise.desc, canonical: url, body, current: "cruise", ogType: "article", published: "2026-11-01",
+    jsonld: [
+      { "@context": "https://schema.org", "@type": "Article", headline: cruise.title, description: cruise.desc, datePublished: "2026-11-01", dateModified: "2026-11-01", mainEntityOfPage: url, author: { "@type": "Person", name: site.owner, url: abs("/") }, publisher: { "@type": "Organization", name: site.legalName, url: abs("/") } },
+      { "@context": "https://schema.org", "@type": "ItemList", name: "What I'd buy for a first cruise", itemListElement: top.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.product, url: abs(pickPath(p)) })) },
+    ] });
 }
 
 function notFound() {
@@ -343,13 +470,14 @@ function notFound() {
 write("index.html", home());
 write("disclosure/index.html", disclosure());
 write("picks/index.html", picksPage());
+write(cruise.path.replace(/^\/|\/$/g, "") + "/index.html", cruisePage());
 write("404.html", notFound());
 for (const p of picks) write(`picks/${p.slug}/index.html`, pickPage(p));
 for (const c of site.categories.filter((c) => picks.some((p) => p.category === c))) write(`category/${slugify(c)}/index.html`, categoryPage(c));
-write("search.json", JSON.stringify(picks.map((p) => ({ slug: p.slug, title: p.title, short: p.short, category: p.category, tags: p.tags, url: pickPath(p), image: p.images[0].src }))));
+write("search.json", JSON.stringify(picks.map((p) => ({ slug: p.slug, title: p.title, short: p.short, category: p.category, tags: p.tags, url: pickPath(p), image: img0(p) ? img0(p).src : "" }))));
 const today = new Date().toISOString().slice(0, 10);
 const newest = picks[0]?.updated || picks[0]?.date || today;
-const urls = [[abs("/"), newest], [abs("/picks/"), newest], [abs("/disclosure/"), site.disclosureUpdated || "2026-10-06"],
+const urls = [[abs("/"), newest], [abs("/picks/"), newest], [abs(cruise.path), "2026-11-01"], [abs("/disclosure/"), site.disclosureUpdated || "2026-10-06"],
   ...site.categories.filter((c) => picks.filter((p) => p.category === c && !p.sample).length >= 2).map((c) => [abs(catPath(c)), newest]),
   ...picks.filter((p) => !p.sample).map((p) => [abs(pickPath(p)), p.updated || p.date])];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(([u, d]) => `  <url><loc>${esc(u)}</loc><lastmod>${d}</lastmod></url>`).join("\n")}\n</urlset>\n`);

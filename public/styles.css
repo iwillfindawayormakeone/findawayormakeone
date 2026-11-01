@@ -227,3 +227,73 @@ footer .fine { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--
   body.has-buybar { padding-bottom: 80px; }
 }
 .video{margin:28px 0 0;border-radius:var(--radius);overflow:hidden;background:var(--bg-2);aspect-ratio:16 / 9}.video iframe{width:100%;height:100%;border:0;display:block}
+
+/* ---------- no-photo placeholder tile ---------- */
+.ph { width: 100%; aspect-ratio: 4 / 3; border-radius: calc(var(--radius) - 6px); display: grid; place-items: center; background: linear-gradient(135deg, hsl(var(--h) 45% 92%), hsl(calc(var(--h) + 40) 40% 84%)); color: hsl(var(--h) 35% 32%); font-weight: 900; font-size: clamp(2.4rem, 7vw, 4.5rem); letter-spacing: -0.04em; user-select: none; }
+.ph.sq { aspect-ratio: 1 / 1; border-radius: 3px; }
+.card.lg .ph { aspect-ratio: 16 / 10; }
+.card.md .ph { aspect-ratio: 8 / 7; }
+.pick-text .watch { margin-top: 12px; }
+.pick-why .watch { margin: 0; }
+
+/* ---------- home: cruise promo + categories ---------- */
+.cruise-promo { padding: clamp(28px, 5vw, 56px) 0 0; }
+.promo { border-radius: var(--radius); padding: clamp(24px, 4vw, 44px); background: var(--ink); color: #fff; }
+.promo .label { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mark); margin-bottom: 8px; }
+.promo h2 { font-size: clamp(1.5rem, 3.2vw, 2.2rem); max-width: 22ch; margin-bottom: 10px; }
+.promo h2 a:hover { text-decoration: underline; text-decoration-color: var(--mark); text-underline-offset: 4px; }
+.promo p { color: rgba(255, 255, 255, 0.78); max-width: 58ch; margin-bottom: 20px; }
+.cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.cats a { display: flex; flex-direction: column; gap: 2px; padding: 16px 18px; border-radius: var(--radius-s); background: var(--bg-2); transition: background 0.4s var(--ease), transform 0.5s var(--ease); }
+.cats a:hover { background: var(--accent-soft); transform: translateY(-2px); }
+.cats b { font-size: 1rem; }
+.cats span { font-size: 0.82rem; color: var(--ink-3); font-weight: 600; }
+
+/* ---------- cruise guide ---------- */
+.cruise-hero h1 { max-width: 20ch; }
+.cruise-hero .lede { max-width: 40em; margin-bottom: 14px; }
+.cruise-hero .context { font-size: 0.95rem; color: var(--ink-2); max-width: 60ch; margin-top: 10px; }
+.jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.jump a { padding: 7px 13px; border-radius: 999px; font-size: 0.84rem; font-weight: 600; color: var(--ink-2); box-shadow: inset 0 0 0 1.5px var(--line); }
+.jump a:hover { background: var(--accent); color: #fff; box-shadow: none; }
+.buy-list { list-style: none; display: grid; gap: 16px; }
+.buy-row { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 20px; padding: 18px; border-radius: var(--radius); background: var(--bg-2); align-items: start; }
+.buy-row .thumb { display: block; border-radius: 10px; overflow: hidden; }
+.buy-row .thumb img, .buy-row .thumb .ph { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; font-size: 2.2rem; }
+.buy-row h3 { font-size: 1.15rem; margin-bottom: 2px; display: flex; align-items: center; gap: 10px; }
+.buy-row h3 a:hover { color: var(--accent); }
+.num { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 0.82rem; font-weight: 800; flex: none; }
+.buy-row .product { font-size: 0.84rem; font-weight: 600; color: var(--ink-3); margin-bottom: 6px; }
+.buy-row p { font-size: 0.98rem; }
+.row-ctas { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-top: 12px; }
+.row-ctas .btn { padding: 10px 12px 10px 18px; font-size: 0.92rem; }
+.row-ctas .btn .ico { width: 24px; height: 24px; font-size: 0.8rem; }
+.buy-list.compact .buy-row { grid-template-columns: 84px minmax(0, 1fr); padding: 14px; }
+.sub { font-size: 1.3rem; margin: clamp(28px, 4vw, 44px) 0 14px; }
+.skip { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.skip div { padding: 16px 18px; border-radius: var(--radius-s); box-shadow: inset 0 0 0 1.5px var(--line); }
+.skip dt { font-weight: 800; margin-bottom: 4px; }
+.skip dt::before { content: "\2715  "; color: #c0392b; font-weight: 900; }
+.skip dd { font-size: 0.95rem; color: var(--ink-2); }
+.checks { list-style: none; display: grid; gap: 8px; }
+.checks li { padding: 10px 14px 10px 40px; border-radius: 10px; background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--line); position: relative; }
+.checks li::before { content: "\2713"; position: absolute; left: 14px; top: 9px; font-weight: 900; color: var(--accent); }
+.walk { list-style: none; display: grid; gap: clamp(22px, 3vw, 34px); }
+.walk h3 { display: flex; align-items: center; gap: 12px; font-size: 1.25rem; margin-bottom: 8px; }
+.walk p { font-size: 1.05rem; }
+.walk p + p { margin-top: 8px; }
+.didnt { margin-top: 12px !important; padding: 12px 16px; border-radius: var(--radius-s); background: var(--warn-bg); color: var(--warn-ink) !important; font-size: 0.96rem !important; }
+.didnt b { color: var(--warn-ink); }
+.steps.six { grid-template-columns: repeat(3, 1fr); }
+.prose-lg p { font-size: 1.08rem; }
+.prose-lg p + p { margin-top: 12px; }
+.prose-lg h2 { margin-bottom: 14px; }
+.days { display: grid; gap: 16px; }
+.days div { padding: 18px 20px; border-radius: var(--radius); background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--line); }
+.days h3 { margin-bottom: 6px; }
+#verify h2 { margin-bottom: 10px; }
+@media (max-width: 720px) {
+  .buy-row { grid-template-columns: 84px minmax(0, 1fr); gap: 14px; padding: 14px; }
+  .buy-list.compact .buy-row { grid-template-columns: 64px minmax(0, 1fr); }
+  .steps.six { grid-template-columns: 1fr; }
+}
